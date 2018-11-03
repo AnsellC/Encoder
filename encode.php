@@ -44,11 +44,11 @@ foreach($animes AS $anime) {
        if (preg_match('/Stream #0/', $line))
         echo $line ."\n";
     }
-    echo "SELECT AUDIO: ";
-    $animes[$i]['audio_stream'] = fgets(STDIN);
+    echo "SELECT VIDEO: ";
+    $animes[$i]['video_stream'] = trim(fgets(STDIN));
 
-    echo "SELECT SUBTITLE: ";
-    $animes[$i]['subtitle_stream'] = fgets(STDIN);
+    echo "SELECT AUDIO: ";
+    $animes[$i]['audio_stream'] = trim(fgets(STDIN));
     echo "\n\n\n";
 
     $i++;
