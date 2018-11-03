@@ -73,14 +73,13 @@ foreach($animes AS $anime) {
         $out_path = $dest .'/'. $anime['path'] .'/'. $video['basename'] .'.mp4';
         $cmd = 'ffmpeg -i "'. $video_path.'"';
         if($anime['audio_stream'] != 'd')
-            $cmd .= ' -map 0:0 -map 0:'. $anime['audio_stream'];
-            
-        $cmd .= '  -c:v libx264 -preset faster -tune animation -crf 23 -profile:v high -level 4.1 -pix_fmt yuv420p -c:a aac -b:a 192k -vf "ass=\''.str_replace(":", "\:", $watermarkPath).'\', subtitles=\''.str_replace(":", "\:", $video_path).'\':si='.$anime['subtitle_stream'].'" "'.$out_path.'"';
+            $cmd .= ' -map 0:0 -map 0:'. trim($anime['audio_stream']);
+
+        $cmd .= ' -c:v libx264 -preset faster -tune animation -crf 23 -profile:v high -level 4.1 -pix_fmt yuv420p -c:a aac -b:a 192k -vf "ass=\''.str_replace(":", "\:", $watermarkPath).'\', subtitles=\''.str_replace(":", "\:", $video_path).'\'" "'.$out_path.'"';
       
         $x++;
         $t++;
         exec($cmd);
-        exit;
 
     }
    
