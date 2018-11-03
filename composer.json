@@ -1,0 +1,13 @@
+{
+    "name": "ansellc/encoder",
+    "require": {
+        "league/flysystem": "^1.0",
+        "php-ffmpeg/php-ffmpeg": "^0.13.0"
+    },
+    "authors": [
+        {
+            "name": "AnsellC",
+            "email": "ansellcruz@gmail.com"
+        }
+    ]
+}
