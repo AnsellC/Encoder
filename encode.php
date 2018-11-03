@@ -2,20 +2,23 @@
 include './vendor/autoload.php';
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
+$dotenv = new Dotenv\Dotenv(__DIR__);
+$dotenv->load();
 
-$binPath = 'C:/Users/AnsellC/Desktop/Encoder/bin';
-$watermarkPath = $binPath . "/au.ass";
+$binPath = getenv('bin_path');
+$watermarkPath = getenv('watermark');
 
 if( !isset($argv[1]) OR !isset($argv[2]) ) {
 
-    $source = "D:/queue";
-    $dest =  "D:/done";
+    $source = getenv('source');
+    $dest =  getenv('dest');
 
 } else {
     $source = $argv[1];
     $dest = $argv[2];
 }
 
+echo $source;
 $adapter = new Local($source);
 $filesystem = new Filesystem($adapter);
 
@@ -69,7 +72,7 @@ foreach($animes AS $anime) {
         $video_path = $source .'/'. $video['path'];
         $out_path = $dest .'/'. $anime['path'] .'/'. $video['basename'] .'.mp4';
         $cmd = 'ffmpeg -i "'. $video_path.'"';
-        $cmd .= ' -c: libx264 -preset faster -tune animation -crf 23 -profile:v high -level 4.1 -pix_fmt yuv420p -c:a aac -b:a 192k -vf "ass=\''.str_replace(":", "\:", $watermarkPath).'\', subtitles=\''.str_replace(":", "\:", $video_path).'\'" "'.$out_path.'"';
+        $cmd .= ' -map 0:0 -map 0:'. $anime['audio_stream'].' -c:v libx264 -preset faster -tune animation -crf 23 -profile:v high -level 4.1 -pix_fmt yuv420p -c:a aac -b:a 192k -vf "ass=\''.str_replace(":", "\:", $watermarkPath).'\', subtitles=\''.str_replace(":", "\:", $video_path).'\':si='.$anime['subtitle_stream'].'" "'.$out_path.'"';
       
         $x++;
         $t++;

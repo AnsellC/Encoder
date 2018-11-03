@@ -2,7 +2,8 @@
     "name": "ansellc/encoder",
     "require": {
         "league/flysystem": "^1.0",
-        "php-ffmpeg/php-ffmpeg": "^0.13.0"
+        "php-ffmpeg/php-ffmpeg": "^0.13.0",
+        "vlucas/phpdotenv": "^2.5"
     },
     "authors": [
         {
