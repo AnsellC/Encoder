@@ -45,7 +45,18 @@ foreach($animes AS $anime) {
         echo $line ."\n";
     }
 
-    echo "Manual or Auto [m]: ";
+    echo "Dub encode?(y/n) [default n]: ";
+    $dub = strtolower(trim(fgets(STDIN)));
+
+    if($dub == 'y') {
+
+        $animes[$i]['encode_path'] = $anime['path'] .' DUB';
+
+    } else {
+        $animes[$i]['encode_path'] = $anime['path'];
+    }
+
+    echo "Manual or Auto?(a/m) [default m]: ";
     $choice = trim(fgets(STDIN));
 
     if ($choice != strtolower('a')) {
@@ -55,9 +66,20 @@ foreach($animes AS $anime) {
         echo "SELECT AUDIO: ";
         $animes[$i]['audio_stream'] = strtolower(trim(fgets(STDIN)));
 
-        echo "SUBS? (Y/N): ";
+        echo "Burn subs?(y/n) [default y]: ";
         $animes[$i]['subs'] = strtolower(trim(fgets(STDIN)));
+
+
+
+    } else {
+        //if auto add subs
+        $anime[$i]['subs'] = 'y';
     }
+
+    /*if($animes[$i]['subs'] == 'y') {
+        echo "Subtitle Type?(ass/dvd) [default ass]: ";
+    }*/
+
     echo "\n\n\n";
     
     $i++;
@@ -69,16 +91,18 @@ $t = 1;
 foreach($animes AS $anime) {
 
     $x = 1;
-    if(!file_exists($dest . '/'. $anime['path'])) {
 
-        mkdir($dest . '/'. $anime['path']);
+
+    if(!file_exists($dest . '/'. $anime['encode_path'])) {
+
+        mkdir($dest . '/'. $anime['encode_path']);
 
     }
     
     foreach($anime['videos'] AS $video) {
 
         $video_path = $source .'/'. $video['path'];
-        $out_path = $dest .'/'. $anime['path'] .'/'. $video['basename'] .'.mp4';
+        $out_path = $dest .'/'. $anime['encode_path'].'/'. $video['basename'] .'.mp4';
 
         if ( file_exists($out_path) ) {
 
@@ -88,7 +112,7 @@ foreach($animes AS $anime) {
 
         echo "ENCODING: \033[0;32m".$video['basename']."\033[0m {$t} of {$total_videos}\n";
 
-        $cmd = 'ffmpeg -i "'. $video_path.'"';
+        $cmd = 'ffmpeg -hide_banner -loglevel warning -i "'. $video_path.'"';
 
         if( isset($anime['video_stream']) AND isset($anime['audio_stream']) ) {
 
