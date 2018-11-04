@@ -92,7 +92,7 @@ foreach($animes AS $anime) {
 
         if( isset($anime['video_stream']) AND isset($anime['audio_stream']) ) {
 
-            $cmd .= "-map 0:{$anime['video_stream']} -map 0:{$anime['audio_stream']}";
+            $cmd .= " -map 0:{$anime['video_stream']} -map 0:{$anime['audio_stream']}";
 
         }
         $cmd .= ' -c:v libx264 -preset faster -tune animation -crf 23 -profile:v high -level 4.1 -pix_fmt yuv420p -c:a aac -b:a 192k';
