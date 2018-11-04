@@ -8,10 +8,10 @@ $fb = new \Facebook\Facebook([
     'app_secret' => getenv('FACEBOOK_APP_SECRET'),
     'default_graph_version' => 'v3.1',
 ]);
-
+echo "Uploading to facebook: ". basename($argv[1]);
 $start = time();
 $data = [
-    'title' => 'funny video '. $start,
+    'title' => basename($argv[1]),
     'source' => $fb->videoToUpload($argv[1]),
     'published' => false,
 ];
@@ -30,4 +30,6 @@ try {
     exit;
 }
 
-echo 'https://www.facebook.com/'. getenv('FACEBOOK_PAGE_ID') .'/videos/'. json_decode($response->getBody())->id . "/";
+$log = fopen("logs/". basename($argv[1]) .".txt", 'a+');
+fwrite($log, 'https://www.facebook.com/'. getenv('FACEBOOK_PAGE_ID') .'/videos/'. json_decode($response->getBody())->id . "/\r\n");
+fclose($log);

@@ -44,13 +44,22 @@ foreach($animes AS $anime) {
        if (preg_match('/Stream #0/', $line))
         echo $line ."\n";
     }
-    echo "SELECT VIDEO: ";
-    $animes[$i]['video_stream'] = trim(fgets(STDIN));
 
-    echo "SELECT AUDIO: ";
-    $animes[$i]['audio_stream'] = trim(fgets(STDIN));
+    echo "Manual or Auto [m]: ";
+    $choice = trim(fgets(STDIN));
+
+    if ($choice != strtolower('a')) {
+        echo "SELECT VIDEO: ";
+        $animes[$i]['video_stream'] = strtolower(trim(fgets(STDIN)));
+
+        echo "SELECT AUDIO: ";
+        $animes[$i]['audio_stream'] = strtolower(trim(fgets(STDIN)));
+
+        echo "SUBS? (Y/N): ";
+        $animes[$i]['subs'] = strtolower(trim(fgets(STDIN)));
+    }
     echo "\n\n\n";
-
+    
     $i++;
 }
 
@@ -68,14 +77,37 @@ foreach($animes AS $anime) {
     
     foreach($anime['videos'] AS $video) {
 
-        echo "ENCODING: \033[0;32m".$video['basename']."\033[0m {$t} of {$total_videos}\n";
         $video_path = $source .'/'. $video['path'];
         $out_path = $dest .'/'. $anime['path'] .'/'. $video['basename'] .'.mp4';
-        $cmd = 'ffmpeg -i "'. $video_path.'"';
-        if($anime['audio_stream'] != 'd')
-            $cmd .= ' -map 0:0 -map 0:'. trim($anime['audio_stream']);
 
-        $cmd .= ' -c:v libx264 -preset faster -tune animation -crf 23 -profile:v high -level 4.1 -pix_fmt yuv420p -c:a aac -b:a 192k -vf "ass=\''.str_replace(":", "\:", $watermarkPath).'\', subtitles=\''.str_replace(":", "\:", $video_path).'\'" "'.$out_path.'"';
+        if ( file_exists($out_path) ) {
+
+            echo "SKIPPING (file exists): \033[0;32m".$video['basename']."\033[0m\n";
+            continue;
+        }
+
+        echo "ENCODING: \033[0;32m".$video['basename']."\033[0m {$t} of {$total_videos}\n";
+
+        $cmd = 'ffmpeg -i "'. $video_path.'"';
+
+        if( isset($anime['video_stream']) AND isset($anime['audio_stream']) ) {
+
+            $cmd .= "-map 0:{$anime['video_stream']} -map 0:{$anime['audio_stream']}";
+
+        }
+        $cmd .= ' -c:v libx264 -preset faster -tune animation -crf 23 -profile:v high -level 4.1 -pix_fmt yuv420p -c:a aac -b:a 192k';
+
+
+        if (isset($anime['subs']) AND $anime['subs'] == 'y') {
+
+            $cmd .= ' -vf "ass=\''.str_replace(":", "\:", $watermarkPath).'\', subtitles=\''.str_replace(":", "\:", $video_path).'\'"';
+
+        } else {
+            
+            $cmd .= ' -vf "ass=\''.str_replace(":", "\:", $watermarkPath).'\'"';
+        }
+        
+        $cmd.= ' "'.$out_path.'"';
       
         $x++;
         $t++;

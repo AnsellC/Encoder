@@ -5,7 +5,7 @@ $dotenv->load();
 
 $target_url = 'http://toys.playercdn.net/upload.rapidvideo.com/upload/index.php';
 
-
+echo "Uploading to Rapidvideo: ". basename($argv[1]);
 
 
 
@@ -13,22 +13,19 @@ function do_post_request($url, $postdata, $files = null)
 { 
     $data = ""; 
     $boundary = "---------------------".substr(md5(rand(0,32000)), 0, 10); 
-
     //Collect Postdata 
     foreach($postdata as $key => $val) 
     { 
         $data .= "--$boundary\n"; 
         $data .= "Content-Disposition: form-data; name=\"".$key."\"\n\n".$val."\n"; 
     } 
-
     $data .= "--$boundary\n"; 
-
     //Collect Filedata 
     foreach($files as $key => $file) 
     { 
         $fileContents = file_get_contents($file); 
 
-        $data .= "Content-Disposition: form-data; name=\"{$key}\"; filename=\"test.mp4\"\n"; 
+        $data .= "Content-Disposition: form-data; name=\"{$key}\"; filename=\"".basename($file)."\"\n"; 
         $data .= "Content-Type: video/mp4\n"; 
         $data .= "Content-Transfer-Encoding: binary\n\n"; 
         $data .= $fileContents."\n"; 
@@ -65,9 +62,23 @@ $postdata = array(
 //sample image 
 $files['files[]'] = $argv[1];
 
-do_post_request($target_url, $postdata, $files); 
+$response = do_post_request($target_url, $postdata, $files); 
 
 
+$log = fopen("logs/". basename($argv[1]) .".txt", 'a+');
+
+if (!empty($response) ) {
+
+    $json = json_decode($response, true);
+    fwrite($log, $json["files"][0]["url"] . "\r\n");
+
+} else {
+
+    fwrite($log, 'RAPIDVIDEO FAIL' . "\r\n");
+
+}
+
+fclose($log);
 
 exit;
 
