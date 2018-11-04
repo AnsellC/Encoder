@@ -73,7 +73,7 @@ foreach($animes AS $anime) {
 
     } else {
         //if auto add subs
-        $anime[$i]['subs'] = 'y';
+        $animes[$i]['subs'] = 'y';
     }
 
     /*if($animes[$i]['subs'] == 'y') {
@@ -98,7 +98,7 @@ foreach($animes AS $anime) {
         mkdir($dest . '/'. $anime['encode_path']);
 
     }
-    
+
     foreach($anime['videos'] AS $video) {
 
         $video_path = $source .'/'. $video['path'];
@@ -110,7 +110,10 @@ foreach($animes AS $anime) {
             continue;
         }
 
-        echo "ENCODING: \033[0;32m".$video['basename']."\033[0m {$t} of {$total_videos}\n";
+        if ($anime['subs'] == 'y')
+            echo "ENCODING: \033[0;32m".$video['basename']."\033[0m \033[0;31m(SUB)\033[0m {$t} of {$total_videos}\n";
+        else 
+            echo "ENCODING: \033[0;32m".$video['basename']."\033[0m {$t} of {$total_videos}\n";
 
         $cmd = 'ffmpeg -hide_banner -loglevel warning -i "'. $video_path.'"';
 
